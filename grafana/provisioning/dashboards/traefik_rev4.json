@@ -16,11 +16,11 @@
   "editable": true,
   "gnetId": 4475,
   "graphTooltip": 0,
-  "id": 2,
-  "iteration": 1561491442605,
+  "iteration": 1574373208117,
   "links": [],
   "panels": [
     {
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -93,14 +93,15 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(traefik_backend_server_up{backend=\"$backend\"})/count(traefik_config_reloads_total)",
+          "expr": "sum(up{service=\"$service\"})/count(traefik_config_reloads_total)",
           "format": "time_series",
+          "hide": true,
           "intervalFactor": 2,
           "refId": "A"
         }
       ],
       "thresholds": "0,1",
-      "title": "$backend status",
+      "title": "$service status",
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -145,14 +146,14 @@
       "strokeWidth": 1,
       "targets": [
         {
-          "expr": "traefik_backend_requests_total{backend=\"$backend\"}",
+          "expr": "traefik_service_requests_total{service=\"$service\"}",
           "format": "time_series",
           "intervalFactor": 2,
           "legendFormat": "{{method}} : {{code}}",
           "refId": "A"
         }
       ],
-      "title": "$backend return code",
+      "title": "$service return code",
       "type": "grafana-piechart-panel",
       "valueName": "current"
     },
@@ -218,14 +219,15 @@
       "tableColumn": "",
       "targets": [
         {
-          "expr": "sum(traefik_backend_request_duration_seconds_sum{backend=\"$backend\"}) / sum(traefik_backend_requests_total{backend=\"$backend\"}) * 1000",
+          "expr": "sum(traefik_service_request_duration_seconds_sum{service=\"$service\"}) / sum(traefik_service_requests_total{service=\"$service\"}) * 1000",
           "format": "time_series",
           "intervalFactor": 2,
           "refId": "A"
         }
       ],
       "thresholds": "",
-      "title": "$backend response time",
+      "title": "$service response time",
+      "transparent": true,
       "type": "singlestat",
       "valueFontSize": "80%",
       "valueMaps": [
@@ -244,6 +246,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 24,
@@ -266,7 +269,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
-      "options": {},
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -277,10 +282,10 @@
       "steppedLine": false,
       "targets": [
         {
-          "expr": "sum(rate(traefik_backend_requests_total{backend=\"$backend\"}[5m]))",
+          "expr": "sum(rate(traefik_service_requests_total{service=\"$service\"}[5m]))",
           "format": "time_series",
           "intervalFactor": 2,
-          "legendFormat": "Total requests $backend",
+          "legendFormat": "Total requests $service",
           "refId": "A"
         }
       ],
@@ -288,7 +293,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Total requests over 5min $backend",
+      "title": "Total requests over 5min $service",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -327,6 +332,7 @@
     },
     {
       "collapsed": false,
+      "datasource": null,
       "gridPos": {
         "h": 1,
         "w": 24,
@@ -345,6 +351,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 12,
@@ -367,7 +374,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
-      "options": {},
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -433,6 +442,7 @@
       "dashes": false,
       "datasource": "Prometheus",
       "fill": 1,
+      "fillGradient": 0,
       "gridPos": {
         "h": 7,
         "w": 12,
@@ -455,7 +465,9 @@
       "linewidth": 1,
       "links": [],
       "nullPointMode": "null",
-      "options": {},
+      "options": {
+        "dataLinks": []
+      },
       "percentage": false,
       "pointradius": 5,
       "points": false,
@@ -546,11 +558,11 @@
       "strokeWidth": 1,
       "targets": [
         {
-          "expr": "sum(rate(traefik_backend_requests_total[5m])) by (backend) ",
+          "expr": "sum(rate(traefik_service_requests_total[5m])) by (service) ",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 2,
-          "legendFormat": "{{ backend }}",
+          "legendFormat": "{{ service }}",
           "refId": "A"
         }
       ],
@@ -603,7 +615,7 @@
       "valueName": "total"
     }
   ],
-  "schemaVersion": 18,
+  "schemaVersion": 20,
   "style": "dark",
   "tags": [
     "traefik",
@@ -614,18 +626,19 @@
       {
         "allValue": null,
         "current": {
-          "text": "backend-grafana",
-          "value": "backend-grafana"
+          "tags": [],
+          "text": "grafana@docker",
+          "value": "grafana@docker"
         },
         "datasource": "Prometheus",
-        "definition": "",
+        "definition": "label_values(service)",
         "hide": 0,
         "includeAll": false,
         "label": null,
         "multi": false,
-        "name": "backend",
+        "name": "service",
         "options": [],
-        "query": "label_values(backend)",
+        "query": "label_values(service)",
         "refresh": 1,
         "regex": "",
         "skipUrlSync": false,
@@ -664,7 +677,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
